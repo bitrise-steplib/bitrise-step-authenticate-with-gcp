@@ -1,0 +1,27 @@
+format_version: "17"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+
+app:
+  envs:
+  - GCP_AUTHENTICATION_SERVICE_ACCOUNT_KEY: $GCP_AUTHENTICATION_SERVICE_ACCOUNT_KEY
+
+workflows:
+  test_authentication_and_docker_login:
+    steps:
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -euo pipefail
+
+            if [ "$(uname)" == "Darwin" ]; then
+              envman add --key DOCKER_LOGIN --value "false"
+            else
+              envman add --key DOCKER_LOGIN --value "true"
+            fi
+    - path::./:
+        inputs:
+        - service_account_key: $GCP_AUTHENTICATION_SERVICE_ACCOUNT_KEY
+        - docker_login: $DOCKER_LOGIN
+        - artifact_registry_locations: |-
+            us-central1-docker.pkg.dev
