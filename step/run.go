@@ -1,7 +1,6 @@
 package step
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -10,24 +9,23 @@ import (
 )
 
 func (s *Step) Run(config Config) (Result, error) {
-	s.logger.Println()
-	s.logger.Infof("Performing GCP authentication:")
+	var keyPath string
 
-	email, err := extractEmail(config.ServiceAccountKey)
-	if err != nil {
-		return Result{}, fmt.Errorf("failed to extract email from service account key: %w", err)
+	if config.ServiceAccountKey != "" {
+		path, err := s.serviceAccountBasedAuthentication(config)
+		if err != nil {
+			return Result{}, fmt.Errorf("service account based authentication failed: %w", err)
+		}
+		keyPath = path
+	} else if config.ClientConfig != "" {
+		path, err := s.identityTokenBasedAuthentication(config)
+		if err != nil {
+			return Result{}, fmt.Errorf("identity token based authentication failed: %w", err)
+		}
+		keyPath = path
+	} else {
+		return Result{}, fmt.Errorf("no authentication method provided")
 	}
-
-	keyPath, err := save(config.ServiceAccountKey)
-	if err != nil {
-		return Result{}, fmt.Errorf("failed to save service account key: %w", err)
-	}
-
-	if err := s.authenticate(email, keyPath); err != nil {
-		return Result{}, fmt.Errorf("failed to authenticate with service account: %w", err)
-	}
-
-	s.logger.Printf("GCP authentication successful")
 
 	token, err := s.generateToken()
 	if err != nil {
@@ -51,41 +49,17 @@ func (s *Step) Run(config Config) (Result, error) {
 	}, nil
 }
 
-func extractEmail(data string) (string, error) {
-	var values map[string]string
-	if err := json.Unmarshal([]byte(data), &values); err != nil {
-		return "", err
-	}
-
-	email, ok := values["client_email"]
-	if !ok {
-		return "", fmt.Errorf("no client_email found")
-	}
-
-	return email, nil
-}
-
-func save(serviceAccountKey string) (string, error) {
-	file, err := os.CreateTemp("", "service_account_key_*.json")
+func save(data, pattern string) (string, error) {
+	file, err := os.CreateTemp("", pattern)
 	if err != nil {
-		return "", fmt.Errorf("failed to create temporary file for service account key: %w", err)
+		return "", fmt.Errorf("failed to create temporary file: %w", err)
 	}
 
-	if _, err := file.WriteString(serviceAccountKey); err != nil {
-		return "", fmt.Errorf("failed to write service account key to temporary file: %w", err)
+	if _, err := file.WriteString(data); err != nil {
+		return "", fmt.Errorf("failed to write to temporary file: %w", err)
 	}
 
 	return file.Name(), nil
-}
-
-func (s *Step) authenticate(email, keyPath string) error {
-	cmd := s.commandFactory.Create("gcloud", []string{"auth", "activate-service-account", email, fmt.Sprintf("--key-file=%s", keyPath)}, nil)
-	if output, err := cmd.RunAndReturnTrimmedCombinedOutput(); err != nil {
-		s.logger.Errorf("GCP authentication output: %s", output)
-		return err
-	}
-
-	return nil
 }
 
 func (s *Step) generateToken() (string, error) {

@@ -20,6 +20,7 @@ toolkit:
 inputs:
 - service_account_key:
   opts:
+    category: Service account
     title: Service account key
     summary: |-
       The service account key in JSON format.
@@ -29,8 +30,31 @@ inputs:
       You can generate a service account key in the Google Cloud Console. Make sure to grant the necessary permissions to the service account.
 
       The step will use this key to authenticate with GCP and generate a Google auth token.
-    is_required: true
     is_sensitive: true
+
+- client_config:
+  opts:
+    category: Identity token
+    title: Client config
+    summary: |-
+      Client config in JSON format.
+    description: |-
+      Client config in JSON format.
+
+      You can generate a client config in the Google Cloud Console. Make sure to grant the necessary permissions to the client.
+    is_sensitive: true
+
+- audience:
+  opts:
+    category: Identity token
+    title: Token audience
+    summary: The audience for the identity token.
+    description: |-
+      The audience for the identity token.
+
+      This could be the URL of the service you want to access with the token or a specific identifier provided by the service.
+    is_required: true
+
 - docker_login: "false"
   opts:
     category: Docker
@@ -47,6 +71,7 @@ inputs:
     value_options:
     - "true"
     - "false"
+
 - artifact_registry_locations:
   opts:
     category: Docker
@@ -59,6 +84,31 @@ inputs:
       The step will log in to the specified locations using the Google auth token generated from the service account key.
 
       These locations can point ot either the deprecated Container Registry or the new Artifact Registry.
+
+- build_url: $BITRISE_BUILD_URL
+  opts:
+    category: Debug
+    title: Bitrise build url
+    summary: Unique build URL of this build on Bitrise.io.
+    description: |-
+      Unique build URL of this build on Bitrise.io.
+
+      By default the step will use the Bitrise API.
+    is_required: true
+    is_dont_change_value: true
+
+- build_api_token: $BITRISE_BUILD_API_TOKEN
+  opts:
+    category: Debug
+    title: Bitrise build token
+    summary: The build's API Token for the build on Bitrise.io
+    description: |-
+      The build's API Token for the build on Bitrise.io
+
+      This will be used to communicate with the Bitrise API
+    is_required: true
+    is_sensitive: true
+
 - verbose: "false"
   opts:
     category: Debugging

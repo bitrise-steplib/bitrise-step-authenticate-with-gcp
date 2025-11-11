@@ -11,16 +11,24 @@ import (
 )
 
 type Input struct {
-	ServiceAccountKey         string `env:"service_account_key,required"`
-	DockerLogin               bool   `env:"docker_login,opt[true,false]"`
-	ArtifactRegistryLocations string `env:"artifact_registry_locations"`
-	Verbose                   bool   `env:"verbose,opt[true,false]"`
+	ServiceAccountKey         string          `env:"service_account_key"`
+	ClientConfig              string          `env:"client_config"`
+	Audience                  string          `env:"audience,required"`
+	DockerLogin               bool            `env:"docker_login,opt[true,false]"`
+	ArtifactRegistryLocations string          `env:"artifact_registry_locations"`
+	BuildURL                  string          `env:"build_url,required"`
+	BuildToken                stepconf.Secret `env:"build_api_token,required"`
+	Verbose                   bool            `env:"verbose,opt[true,false]"`
 }
 
 type Config struct {
 	ServiceAccountKey         string
+	ClientConfig              string
+	Audience                  string
 	DockerLogin               bool
 	ArtifactRegistryLocations []string
+	BuildURL                  string
+	BuildToken                stepconf.Secret
 }
 
 type Result struct {
@@ -59,6 +67,10 @@ func (s *Step) ProcessConfig() (*Config, error) {
 	stepconf.Print(input)
 	s.logger.EnableDebugLog(input.Verbose)
 
+	if input.ServiceAccountKey != "" && input.ClientConfig != "" {
+		return &Config{}, fmt.Errorf("only one authentication method can be used at a time (either Service Account or Identity Token)")
+	}
+
 	var locations []string
 	for _, location := range strings.Split(input.ArtifactRegistryLocations, "\n") {
 		if location == "" {
@@ -73,7 +85,11 @@ func (s *Step) ProcessConfig() (*Config, error) {
 
 	return &Config{
 		ServiceAccountKey:         input.ServiceAccountKey,
+		ClientConfig:              input.ClientConfig,
+		Audience:                  input.Audience,
 		DockerLogin:               input.DockerLogin,
 		ArtifactRegistryLocations: locations,
+		BuildURL:                  input.BuildURL,
+		BuildToken:                input.BuildToken,
 	}, nil
 }
