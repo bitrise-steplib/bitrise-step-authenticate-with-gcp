@@ -53,7 +53,6 @@ inputs:
       The audience for the identity token.
 
       This could be the URL of the service you want to access with the token or a specific identifier provided by the service.
-    is_required: true
 
 - docker_login: "false"
   opts:

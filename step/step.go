@@ -13,7 +13,7 @@ import (
 type Input struct {
 	ServiceAccountKey         string          `env:"service_account_key"`
 	ClientConfig              string          `env:"client_config"`
-	Audience                  string          `env:"audience,required"`
+	Audience                  string          `env:"audience"`
 	DockerLogin               bool            `env:"docker_login,opt[true,false]"`
 	ArtifactRegistryLocations string          `env:"artifact_registry_locations"`
 	BuildURL                  string          `env:"build_url,required"`
@@ -69,6 +69,10 @@ func (s *Step) ProcessConfig() (*Config, error) {
 
 	if input.ServiceAccountKey != "" && input.ClientConfig != "" {
 		return &Config{}, fmt.Errorf("only one authentication method can be used at a time (either Service Account or Identity Token)")
+	}
+
+	if input.ClientConfig != "" && input.Audience == "" {
+		return &Config{}, fmt.Errorf("audience must be specified when authenticating with an identity token")
 	}
 
 	var locations []string
