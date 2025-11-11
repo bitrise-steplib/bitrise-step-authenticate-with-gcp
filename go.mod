@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.37
 	github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25
+	github.com/bitrise-steplib/bitrise-step-get-identity-token v0.0.0-20251021113737-83bf67e7d713
 	github.com/stretchr/testify v1.10.0
 )
 
