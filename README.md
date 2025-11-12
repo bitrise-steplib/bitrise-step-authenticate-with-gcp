@@ -27,9 +27,13 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 
 | Key | Description | Flags | Default |
 | --- | --- | --- | --- |
-| `service_account_key` | The service account key in JSON format.  You can generate a service account key in the Google Cloud Console. Make sure to grant the necessary permissions to the service account.  The step will use this key to authenticate with GCP and generate a Google auth token. | required, sensitive |  |
+| `service_account_key` | The service account key in JSON format.  You can generate a service account key in the Google Cloud Console. Make sure to grant the necessary permissions to the service account.  The step will use this key to authenticate with GCP and generate a Google auth token. | sensitive |  |
+| `client_config` | Client config in JSON format.  You can generate a client config in the Google Cloud Console. Make sure to grant the necessary permissions to the client. | sensitive |  |
+| `audience` | The audience for the identity token.  This could be the URL of the service you want to access with the token or a specific identifier provided by the service. |  |  |
 | `docker_login` | Performs Docker login with an auth token.  The step will log in to the Artifact Registry locations specified in the `artifact_registry_locations` input.  It is supported only on the Linux stacks. | required | `false` |
 | `artifact_registry_locations` | A newline (`\n`) separated list of Artifact Registry locations to log in to.  The step will log in to the specified locations using the Google auth token generated from the service account key.  These locations can point ot either the deprecated Container Registry or the new Artifact Registry. |  |  |
+| `build_url` | Unique build URL of this build on Bitrise.io.  By default the step will use the Bitrise API. | required | `$BITRISE_BUILD_URL` |
+| `build_api_token` | The build's API Token for the build on Bitrise.io  This will be used to communicate with the Bitrise API | required, sensitive | `$BITRISE_BUILD_API_TOKEN` |
 | `verbose` | Enable logging additional information for debugging. | required | `false` |
 </details>
 

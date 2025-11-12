@@ -4,8 +4,11 @@ github.com/bitrise-io/go-steputils/v2/export
 github.com/bitrise-io/go-steputils/v2/stepconf
 # github.com/bitrise-io/go-utils v1.0.13
 ## explicit; go 1.13
+github.com/bitrise-io/go-utils/colorstring
 github.com/bitrise-io/go-utils/command
+github.com/bitrise-io/go-utils/log
 github.com/bitrise-io/go-utils/pathutil
+github.com/bitrise-io/go-utils/retry
 github.com/bitrise-io/go-utils/ziputil
 # github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25
 ## explicit; go 1.17
@@ -17,6 +20,9 @@ github.com/bitrise-io/go-utils/v2/log
 github.com/bitrise-io/go-utils/v2/log/colorstring
 github.com/bitrise-io/go-utils/v2/pathutil
 github.com/bitrise-io/go-utils/v2/retryhttp
+# github.com/bitrise-steplib/bitrise-step-get-identity-token v0.0.0-20251021113737-83bf67e7d713
+## explicit; go 1.18
+github.com/bitrise-steplib/bitrise-step-get-identity-token/api
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
