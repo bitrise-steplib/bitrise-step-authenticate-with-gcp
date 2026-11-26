@@ -66,6 +66,8 @@ func (s *Step) generateToken() (string, error) {
 	cmd := s.commandFactory.Create("gcloud", []string{"auth", "print-access-token", "--quiet"}, nil)
 	output, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
+		// No token is printed on failure, only gcloud's error (e.g. a rejected token exchange), so it's safe to log
+		s.logger.Errorf("GCP access token output: %s", output)
 		return "", err
 	}
 
